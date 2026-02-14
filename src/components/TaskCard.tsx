@@ -2,7 +2,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Task, Profile } from '@/types';
-import { AlignLeft, Calendar, MoreHorizontal, Trash2 } from 'lucide-react';
+import { AlignLeft, Calendar, MoreHorizontal, Trash2, Clock } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
