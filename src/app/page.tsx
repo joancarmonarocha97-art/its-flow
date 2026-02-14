@@ -49,28 +49,28 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col bg-gray-50">
-      <nav className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm z-10">
-        <div className="flex items-center gap-8">
-          <h1 className="text-xl font-bold text-blue-600 flex items-center gap-2">
+      <nav className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 flex items-center justify-between shadow-sm z-10 sticky top-0">
+        <div className="flex items-center gap-4 md:gap-8">
+          <h1 className="text-lg md:text-xl font-bold text-blue-600 flex items-center gap-2">
             <span className="bg-blue-600 text-white p-1 rounded">IF</span>
-            ITS Flow
+            <span className="hidden md:inline">ITS Flow</span>
           </h1>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Search Bar */}
-          <div className="relative">
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* Search Bar - Hidden on mobile for now to save space */}
+          <div className="relative hidden md:block">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search tasks..."
-              className="pl-9 pr-4 py-1.5 bg-gray-100 border-transparent focus:bg-white focus:border-blue-500 focus:ring-0 rounded-md text-sm w-64 transition-all"
+              className="pl-9 pr-4 py-1.5 bg-gray-100 border-transparent focus:bg-white focus:border-blue-500 focus:ring-0 rounded-md text-sm w-40 md:w-64 transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          <div className="h-6 w-px bg-gray-200 mx-2"></div>
+          <div className="h-6 w-px bg-gray-200 mx-2 hidden md:block"></div>
 
           {/* Real User Profile */}
           <div className="flex items-center gap-3">
@@ -78,11 +78,11 @@ export default function Home() {
               className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => setIsProfileModalOpen(true)}
             >
-              <div className="flex flex-col items-end">
+              <div className="hidden md:flex flex-col items-end">
                 <span className="text-sm font-medium text-gray-700">{user.user_metadata.full_name || user.email}</span>
                 <span className="text-xs text-gray-500 capitalize">{user.user_metadata.role || 'technician'}</span>
               </div>
-              <div className="w-9 h-9 rounded-full bg-blue-100 border border-blue-200 overflow-hidden">
+              <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-blue-100 border border-blue-200 overflow-hidden">
                 <img
                   src={user.user_metadata.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`}
                   className="w-full h-full object-cover"
@@ -101,9 +101,9 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="flex-1 overflow-hidden p-6 flex flex-col">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-3 bg-white p-1 rounded-lg border border-gray-200 shadow-sm">
+      <div className="flex-1 overflow-hidden p-2 md:p-6 flex flex-col">
+        <div className="flex justify-between items-center mb-4 md:mb-6 gap-2 overflow-x-auto pb-2 md:pb-0">
+          <div className="flex items-center gap-1 md:gap-3 bg-white p-1 rounded-lg border border-gray-200 shadow-sm flex-shrink-0">
             <button
               onClick={() => setViewMode('board')}
               className={clsx(
@@ -112,7 +112,7 @@ export default function Home() {
               )}
             >
               <LayoutGrid size={16} />
-              Board
+              <span className="hidden sm:inline">Board</span>
             </button>
             <button
               onClick={() => setViewMode('list')}
@@ -122,7 +122,7 @@ export default function Home() {
               )}
             >
               <List size={16} />
-              List
+              <span className="hidden sm:inline">List</span>
             </button>
             <button
               onClick={() => setViewMode('calendar')}
@@ -132,7 +132,7 @@ export default function Home() {
               )}
             >
               <Calendar size={16} />
-              Calendar
+              <span className="hidden sm:inline">Calendar</span>
             </button>
             <button
               onClick={() => setViewMode('team')}
@@ -142,7 +142,7 @@ export default function Home() {
               )}
             >
               <Users size={16} />
-              Team
+              <span className="hidden sm:inline">Team</span>
             </button>
           </div>
 
@@ -150,14 +150,15 @@ export default function Home() {
           <button
             onClick={() => setMyTasksOnly(!myTasksOnly)}
             className={clsx(
-              "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm border",
+              "flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm border flex-shrink-0 whitespace-nowrap",
               myTasksOnly
                 ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
                 : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
             )}
           >
             <Filter size={16} />
-            {myTasksOnly ? 'Showing My Tasks' : 'All Tasks'}
+            {myTasksOnly ? 'My Tasks' : <span className="hidden sm:inline">All Tasks</span>}
+            {!myTasksOnly && <span className="sm:hidden">All</span>}
           </button>
         </div>
 
