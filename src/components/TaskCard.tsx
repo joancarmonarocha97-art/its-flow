@@ -61,10 +61,10 @@ export function TaskCard({ task, profile, onClick, onDelete }: Props) {
                         e.stopPropagation();
                         onDelete();
                     }}
-                    className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded opacity-0 group-hover:opacity-100 transition-all z-10"
+                    className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-all z-10"
                     title="Delete task"
                 >
-                    <Trash2 size={14} />
+                    <Trash2 size={16} />
                 </button>
             )}
 

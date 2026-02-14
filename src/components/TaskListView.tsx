@@ -7,6 +7,7 @@ import { EditTaskPanel } from './EditTaskPanel';
 import { CreateTaskModal } from './CreateTaskModal';
 import { clsx } from 'clsx';
 import { Calendar, User, ArrowUpDown, Filter, ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
+import { useTasksData } from '@/hooks/useTasksData';
 
 interface TaskListViewProps {
     searchQuery: string;
@@ -15,34 +16,12 @@ interface TaskListViewProps {
 }
 
 export function TaskListView({ searchQuery, myTasksOnly, currentUserId }: TaskListViewProps) {
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [columns, setColumns] = useState<TaskColumn[]>([]);
-    const [profiles, setProfiles] = useState<Record<string, Profile>>({});
-    const [isLoading, setIsLoading] = useState(true);
+    const { filteredTasks: tasks, columns, profiles, isLoading, isConnected } = useTasksData(searchQuery, myTasksOnly, currentUserId);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // Sorting state
     const [sortConfig, setSortConfig] = useState<{ key: keyof Task; direction: 'asc' | 'desc' } | null>(null);
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    async function fetchData() {
-        setIsLoading(true);
-        const { data: cols } = await supabase.from('task_columns').select('*').order('position');
-        const { data: tks } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
-        const { data: pros } = await supabase.from('profiles').select('*');
-
-        if (cols) setColumns(cols);
-        if (tks) setTasks(tks);
-
-        const profileMap: Record<string, Profile> = {};
-        pros?.forEach(p => profileMap[p.id] = p);
-        setProfiles(profileMap);
-        setIsLoading(false);
-    }
 
     const handleSort = (key: keyof Task) => {
         let direction: 'asc' | 'desc' = 'asc';
@@ -62,21 +41,13 @@ export function TaskListView({ searchQuery, myTasksOnly, currentUserId }: TaskLi
                 .eq('id', taskId);
 
             if (error) throw error;
-            fetchData();
         } catch (error) {
             console.error('Error deleting task:', error);
             alert('Error deleting task');
         }
     }
 
-    const filteredTasks = tasks.filter(task => {
-        const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            task.description?.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesUser = myTasksOnly ? task.assignee_id === currentUserId : true;
-        return matchesSearch && matchesUser;
-    });
-
-    const sortedTasks = [...filteredTasks].sort((a, b) => {
+    const sortedTasks = [...tasks].sort((a, b) => {
         if (!sortConfig) return 0;
         const { key, direction } = sortConfig;
         if (a[key] === null) return 1;
@@ -108,6 +79,10 @@ export function TaskListView({ searchQuery, myTasksOnly, currentUserId }: TaskLi
             <div className="flex-1 overflow-auto">
                 <div className="min-w-[800px]">
                     {/* Header */}
+                    <div className="flex items-center gap-2 px-4 py-2">
+                        <div className={clsx("w-2 h-2 rounded-full", isConnected ? "bg-green-500" : "bg-red-500")} title={isConnected ? "Realtime Connected" : "Disconnected"} />
+                        <span className="text-xs text-gray-400">{isConnected ? "Live" : "Offline"}</span>
+                    </div>
                     <div className="grid grid-cols-[1fr_120px_120px_150px_120px_50px] gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-sm text-gray-500 sticky top-0 z-10">
                         <div onClick={() => handleSort('title')} className="cursor-pointer hover:text-gray-700 flex items-center gap-1">
                             Task Name {sortConfig?.key === 'title' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
@@ -181,7 +156,7 @@ export function TaskListView({ searchQuery, myTasksOnly, currentUserId }: TaskLi
                                                 e.stopPropagation();
                                                 handleDeleteTask(task.id);
                                             }}
-                                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded opacity-0 group-hover:opacity-100 transition-all"
+                                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-all"
                                             title="Delete task"
                                         >
                                             <Trash2 size={16} />
@@ -203,7 +178,7 @@ export function TaskListView({ searchQuery, myTasksOnly, currentUserId }: TaskLi
             <CreateTaskModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
-                onTaskCreated={fetchData}
+                onTaskCreated={() => { }}
                 profiles={Object.values(profiles)}
                 columns={columns}
             />
@@ -213,7 +188,7 @@ export function TaskListView({ searchQuery, myTasksOnly, currentUserId }: TaskLi
                 task={selectedTask}
                 isOpen={!!selectedTask}
                 onClose={() => setSelectedTask(null)}
-                onTaskUpdated={fetchData}
+                onTaskUpdated={() => { }}
                 profiles={Object.values(profiles)}
                 columns={columns}
             />

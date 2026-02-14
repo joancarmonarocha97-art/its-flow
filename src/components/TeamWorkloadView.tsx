@@ -6,28 +6,10 @@ import { supabase } from '@/lib/supabaseClient';
 import { Task, Profile, TaskColumn } from '@/types';
 import { Users, AlertCircle, CheckCircle2, Clock, Briefcase } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useTasksData } from '@/hooks/useTasksData';
 
 export function TeamWorkloadView() {
-    const [profiles, setProfiles] = useState<Profile[]>([]);
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [columns, setColumns] = useState<TaskColumn[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    async function fetchData() {
-        setLoading(true);
-        const { data: pros } = await supabase.from('profiles').select('*');
-        const { data: tks } = await supabase.from('tasks').select('*');
-        const { data: cols } = await supabase.from('task_columns').select('*');
-
-        if (pros) setProfiles(pros);
-        if (tks) setTasks(tks);
-        if (cols) setColumns(cols);
-        setLoading(false);
-    }
+    const { tasks, columns, profiles, isLoading: loading } = useTasksData();
 
     const getMemberStats = (memberId: string) => {
         const memberTasks = tasks.filter(t => t.assignee_id === memberId);

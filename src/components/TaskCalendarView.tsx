@@ -12,6 +12,7 @@ import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './calendar.css';
+import { useTasksData } from '@/hooks/useTasksData';
 
 const locales = {
     'en-US': enUS,
@@ -41,29 +42,16 @@ interface TaskCalendarViewProps {
 }
 
 export function TaskCalendarView({ searchQuery, myTasksOnly, currentUserId }: TaskCalendarViewProps) {
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [columns, setColumns] = useState<TaskColumn[]>([]);
-    const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+    const { filteredTasks: tasks, columns, profiles, refresh } = useTasksData(searchQuery, myTasksOnly, currentUserId);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // Derived state for events
     const [events, setEvents] = useState<CalendarEvent[]>([]);
 
+    // Re-calculate events when tasks change
     useEffect(() => {
-        fetchData();
-    }, []);
-
-    // Re-calculate events when tasks or filters change
-    useEffect(() => {
-        const filteredTasks = tasks.filter(task => {
-            const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                task.description?.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesUser = myTasksOnly ? task.assignee_id === currentUserId : true;
-            return matchesSearch && matchesUser;
-        });
-
-        const mappedEvents = filteredTasks
+        const mappedEvents = tasks
             .filter(t => t.due_date)
             .map(t => ({
                 id: t.id,
@@ -74,20 +62,7 @@ export function TaskCalendarView({ searchQuery, myTasksOnly, currentUserId }: Ta
                 resource: t,
             }));
         setEvents(mappedEvents);
-    }, [tasks, searchQuery, myTasksOnly, currentUserId]);
-
-    async function fetchData() {
-        const { data: cols } = await supabase.from('task_columns').select('*').order('position');
-        const { data: tks } = await supabase.from('tasks').select('*');
-        const { data: pros } = await supabase.from('profiles').select('*');
-
-        if (cols) setColumns(cols);
-        if (tks) setTasks(tks);
-
-        const profileMap: Record<string, Profile> = {};
-        pros?.forEach(p => profileMap[p.id] = p);
-        setProfiles(profileMap);
-    }
+    }, [tasks]);
 
 
     const priorityColor = (p: string) => ({
@@ -158,7 +133,7 @@ export function TaskCalendarView({ searchQuery, myTasksOnly, currentUserId }: Ta
             <CreateTaskModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
-                onTaskCreated={fetchData}
+                onTaskCreated={() => { }}
                 profiles={Object.values(profiles)}
                 columns={columns}
             />
@@ -167,7 +142,7 @@ export function TaskCalendarView({ searchQuery, myTasksOnly, currentUserId }: Ta
                 task={selectedTask}
                 isOpen={!!selectedTask}
                 onClose={() => setSelectedTask(null)}
-                onTaskUpdated={fetchData}
+                onTaskUpdated={() => { }}
                 profiles={Object.values(profiles)}
                 columns={columns}
             />

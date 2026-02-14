@@ -19,7 +19,8 @@ import { KanbanColumn } from './KanbanColumn';
 import { TaskCard } from './TaskCard';
 import { CreateTaskModal } from './CreateTaskModal';
 import { createPortal } from 'react-dom';
-
+import { useTasksData } from '@/hooks/useTasksData';
+import { clsx } from 'clsx';
 import { EditTaskPanel } from './EditTaskPanel';
 
 interface KanbanBoardProps {
@@ -29,6 +30,7 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ searchQuery, myTasksOnly, currentUserId }: KanbanBoardProps) {
+    const { tasks: serverTasks, columns: serverColumns, profiles: serverProfiles, isConnected } = useTasksData();
     const [columns, setColumns] = useState<TaskColumn[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [profiles, setProfiles] = useState<Record<string, Profile>>({});
@@ -45,24 +47,19 @@ export function KanbanBoard({ searchQuery, myTasksOnly, currentUserId }: KanbanB
     );
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        setTasks(serverTasks);
+    }, [serverTasks]);
 
-    async function fetchData() {
-        const { data: cols } = await supabase.from('task_columns').select('*').order('position');
-        const { data: tks } = await supabase.from('tasks').select('*');
-        const { data: pros } = await supabase.from('profiles').select('*');
+    useEffect(() => {
+        setColumns(serverColumns);
+    }, [serverColumns]);
 
-        if (cols) setColumns(cols);
-        if (tks) setTasks(tks);
-
-        const profileMap: Record<string, Profile> = {};
-        pros?.forEach(p => profileMap[p.id] = p);
-        setProfiles(profileMap);
-    }
+    useEffect(() => {
+        setProfiles(serverProfiles);
+    }, [serverProfiles]);
 
     function handleTaskCreated() {
-        fetchData();
+        // Realtime subscription handles updates
     }
 
     function handleTaskClick(task: Task) {
@@ -79,7 +76,6 @@ export function KanbanBoard({ searchQuery, myTasksOnly, currentUserId }: KanbanB
                 .eq('id', taskId);
 
             if (error) throw error;
-            fetchData();
         } catch (error) {
             console.error('Error deleting task:', error);
             alert('Error deleting task');
@@ -150,7 +146,13 @@ export function KanbanBoard({ searchQuery, myTasksOnly, currentUserId }: KanbanB
     return (
         <div className="flex flex-col h-full">
             <div className="flex justify-between items-center mb-6 px-4">
-                <h2 className="text-2xl font-bold text-gray-800">Board</h2>
+                <div className="flex items-center gap-4">
+                    <h2 className="text-2xl font-bold text-gray-800">Board</h2>
+                    <div className="flex items-center gap-2">
+                        <div className={clsx("w-2 h-2 rounded-full", isConnected ? "bg-green-500" : "bg-red-500")} title={isConnected ? "Realtime Connected" : "Disconnected"} />
+                        <span className="text-xs text-gray-400">{isConnected ? "Live" : "Offline"}</span>
+                    </div>
+                </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
@@ -203,7 +205,7 @@ export function KanbanBoard({ searchQuery, myTasksOnly, currentUserId }: KanbanB
                 task={selectedTask}
                 isOpen={!!selectedTask}
                 onClose={() => setSelectedTask(null)}
-                onTaskUpdated={fetchData}
+                onTaskUpdated={() => { }}
                 profiles={Object.values(profiles)}
                 columns={columns}
             />
