@@ -9,7 +9,8 @@ import { clsx } from 'clsx';
 import { useTasksData } from '@/hooks/useTasksData';
 
 export function TeamWorkloadView() {
-    const { tasks, columns, profiles, isLoading: loading } = useTasksData();
+    const { tasks, columns, profiles: profilesRecord, isLoading: loading } = useTasksData();
+    const profiles = Object.values(profilesRecord);
 
     const getMemberStats = (memberId: string) => {
         const memberTasks = tasks.filter(t => t.assignee_id === memberId);
