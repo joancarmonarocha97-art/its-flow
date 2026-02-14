@@ -52,6 +52,23 @@ export function TaskListView({ searchQuery, myTasksOnly, currentUserId }: TaskLi
         setSortConfig({ key, direction });
     };
 
+    async function handleDeleteTask(taskId: string) {
+        if (!confirm('Are you sure you want to delete this task?')) return;
+
+        try {
+            const { error } = await supabase
+                .from('tasks')
+                .delete()
+                .eq('id', taskId);
+
+            if (error) throw error;
+            fetchData();
+        } catch (error) {
+            console.error('Error deleting task:', error);
+            alert('Error deleting task');
+        }
+    }
+
     const filteredTasks = tasks.filter(task => {
         const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             task.description?.toLowerCase().includes(searchQuery.toLowerCase());
