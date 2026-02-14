@@ -1,4 +1,3 @@
-
 /* Custom styles for react-big-calendar */
 
 .rbc-calendar {
@@ -8,7 +7,8 @@
 .rbc-header {
     padding: 12px 4px;
     font-weight: 600;
-    color: #4b5563; /* gray-600 */
+    color: #4b5563;
+    /* gray-600 */
     border-bottom: 1px solid #e5e7eb;
     text-transform: uppercase;
     font-size: 0.75rem;
@@ -20,7 +20,8 @@
 }
 
 .rbc-month-row {
-    border-bottom: 1px solid #e5e7eb; /* gray-200 */
+    border-bottom: 1px solid #e5e7eb;
+    /* gray-200 */
 }
 
 .rbc-day-bg {
@@ -28,17 +29,20 @@
 }
 
 .rbc-off-range-bg {
-    background-color: #f9fafb; /* gray-50 */
+    background-color: #f9fafb;
+    /* gray-50 */
 }
 
 .rbc-date-cell {
     padding: 8px;
     font-weight: 500;
-    color: #374151; /* gray-700 */
+    color: #374151;
+    /* gray-700 */
 }
 
 .rbc-today {
-    background-color: #eff6ff; /* blue-50 */
+    background-color: #eff6ff;
+    /* blue-50 */
 }
 
 .rbc-event {
@@ -48,4 +52,46 @@
 
 .rbc-event-content {
     font-size: 0.85rem;
+}
+
+/* HIDE TIME GRID IN WEEK VIEW */
+.rbc-time-view .rbc-time-content {
+    display: none !important;
+}
+
+.rbc-time-view .rbc-time-header {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    border-bottom: none !important;
+}
+
+/* Hide the "all day" label column if it exists to give more space */
+.rbc-time-header-gutter {
+    display: none !important;
+}
+
+/* Ensure the content expands */
+.rbc-time-view {
+    border: none !important;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.rbc-time-header-content {
+    border-left: none !important;
+    min-height: 200px;
+    /* Ensure some height */
+}
+
+.rbc-allday-cell {
+    height: auto !important;
+    max-height: none !important;
+    /* Allow growing */
+}
+
+.rbc-row-content {
+    z-index: 4;
+    /* Ensure generic row content stays above (if needed) */
 }

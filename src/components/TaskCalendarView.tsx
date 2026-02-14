@@ -145,7 +145,7 @@ export function TaskCalendarView({ searchQuery, myTasksOnly, currentUserId }: Ta
                     startAccessor="start"
                     endAccessor="end"
                     style={{ height: 'calc(100vh - 250px)' }}
-                    views={[Views.MONTH, Views.WEEK, Views.AGENDA]}
+                    views={[Views.MONTH, Views.WEEK]}
                     defaultView={Views.MONTH}
                     onSelectEvent={(event) => setSelectedTask(event.resource)}
                     eventPropGetter={eventStyleGetter}
@@ -208,7 +208,7 @@ const CustomToolbar = (toolbar: any) => {
                     Today
                 </button>
                 <div className="flex bg-gray-100 rounded-md p-0.5">
-                    {['month', 'week', 'agenda'].map(view => (
+                    {['month', 'week'].map(view => (
                         <button
                             key={view}
                             onClick={() => toolbar.onView(view)}
