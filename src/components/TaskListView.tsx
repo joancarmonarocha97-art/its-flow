@@ -91,19 +91,19 @@ export function TaskListView({ searchQuery, myTasksOnly, currentUserId }: TaskLi
             {/* Header */}
             <div className="grid grid-cols-[1fr_120px_120px_150px_120px_50px] gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-sm text-gray-500">
                 <div onClick={() => handleSort('title')} className="cursor-pointer hover:text-gray-700 flex items-center gap-1">
-                    Task Name {sortConfig.key === 'title' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                    Task Name {sortConfig?.key === 'title' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
                 </div>
                 <div onClick={() => handleSort('priority')} className="cursor-pointer hover:text-gray-700 flex items-center gap-1">
-                    Priority {sortConfig.key === 'priority' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                    Priority {sortConfig?.key === 'priority' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
                 </div>
                 <div onClick={() => handleSort('column_id')} className="cursor-pointer hover:text-gray-700 flex items-center gap-1">
-                    Status {sortConfig.key === 'column_id' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                    Status {sortConfig?.key === 'column_id' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
                 </div>
                 <div onClick={() => handleSort('assignee_id')} className="cursor-pointer hover:text-gray-700 flex items-center gap-1">
-                    Assignee {sortConfig.key === 'assignee_id' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                    Assignee {sortConfig?.key === 'assignee_id' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
                 </div>
                 <div onClick={() => handleSort('due_date')} className="cursor-pointer hover:text-gray-700 flex items-center gap-1">
-                    Due Date {sortConfig.key === 'due_date' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                    Due Date {sortConfig?.key === 'due_date' && (sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
                 </div>
                 <div></div> {/* Actions Column */}
             </div>
