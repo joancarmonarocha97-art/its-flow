@@ -69,6 +69,23 @@ export function KanbanBoard({ searchQuery, myTasksOnly, currentUserId }: KanbanB
         setSelectedTask(task);
     }
 
+    async function handleDeleteTask(taskId: string) {
+        if (!confirm('Are you sure you want to delete this task?')) return;
+
+        try {
+            const { error } = await supabase
+                .from('tasks')
+                .delete()
+                .eq('id', taskId);
+
+            if (error) throw error;
+            fetchData();
+        } catch (error) {
+            console.error('Error deleting task:', error);
+            alert('Error deleting task');
+        }
+    }
+
     function handleDragStart(event: DragStartEvent) {
         if (event.active.data.current?.type === 'Task') {
             setActiveTask(event.active.data.current.task);
