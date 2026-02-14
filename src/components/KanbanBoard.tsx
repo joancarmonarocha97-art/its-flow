@@ -156,6 +156,7 @@ export function KanbanBoard({ searchQuery, myTasksOnly, currentUserId }: KanbanB
                             tasks={filteredTasks.filter(t => t.column_id === col.id)}
                             profiles={profiles}
                             onTaskClick={handleTaskClick}
+                            onDeleteTask={handleDeleteTask}
                         />
                     ))}
 

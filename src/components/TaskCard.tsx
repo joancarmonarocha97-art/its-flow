@@ -1,8 +1,8 @@
-
+```typescript
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Task, Profile } from '@/types';
-import { Clock, AlertCircle } from 'lucide-react';
+import { AlignLeft, Calendar, MoreHorizontal, Trash2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -10,9 +10,10 @@ interface Props {
     task: Task;
     profile?: Profile | null;
     onClick?: () => void;
+    onDelete?: () => void;
 }
 
-export function TaskCard({ task, profile, onClick }: Props) {
+export function TaskCard({ task, profile, onClick, onDelete }: Props) {
     const {
         attributes,
         listeners,
@@ -31,27 +32,15 @@ export function TaskCard({ task, profile, onClick }: Props) {
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
+        opacity: isDragging ? 0.5 : 1,
     };
 
-    if (isDragging) {
-        return (
-            <div
-                ref={setNodeRef}
-                style={style}
-                className={twMerge(
-                    "bg-white p-4 rounded-lg shadow-sm border-2 border-primary/50 opacity-50 h-[100px]",
-                    "cursor-grab"
-                )}
-            />
-        );
-    }
-
-    const priorityColor = {
-        low: 'bg-green-100 text-green-800',
-        medium: 'bg-yellow-100 text-yellow-800',
-        high: 'bg-orange-100 text-orange-800',
-        critical: 'bg-red-100 text-red-800',
-    }[task.priority];
+    const priorityColors = {
+        low: 'bg-blue-100 text-blue-700',
+        medium: 'bg-yellow-100 text-yellow-700',
+        high: 'bg-orange-100 text-orange-700',
+        critical: 'bg-red-100 text-red-700',
+    };
 
     return (
         <div
@@ -61,12 +50,26 @@ export function TaskCard({ task, profile, onClick }: Props) {
             {...listeners}
             onClick={onClick}
             className={twMerge(
-                "bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer group",
+                "bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer group relative",
                 "flex flex-col gap-2"
             )}
         >
+            {/* Delete Button (Visible on Hover) */}
+            {onDelete && (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
+                    }}
+                    className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded opacity-0 group-hover:opacity-100 transition-all z-10"
+                    title="Delete task"
+                >
+                    <Trash2 size={14} />
+                </button>
+            )}
+
             <div className="flex justify-between items-start">
-                <span className={clsx("text-xs font-semibold px-2 py-0.5 rounded-full capitalize", priorityColor)}>
+                <span className={clsx("text-xs font-semibold px-2 py-0.5 rounded-full capitalize", priorityColors[task.priority])}>
                     {task.priority}
                 </span>
                 {/* Actions could go here */}

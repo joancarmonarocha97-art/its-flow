@@ -4,52 +4,42 @@ import { CSS } from '@dnd-kit/utilities';
 import { TaskColumn, Task, Profile } from '@/types';
 import { TaskCard } from './TaskCard';
 import { clsx } from 'clsx';
+import { useDroppable } from '@dnd-kit/core'; // Added import
+import { useMemo } from 'react'; // Added import
+import { MoreHorizontal } from 'lucide-react'; // Added import
 
 interface Props {
     column: TaskColumn;
     tasks: Task[];
     profiles: Record<string, Profile>;
     onTaskClick: (task: Task) => void;
+    onDeleteTask: (taskId: string) => void;
 }
 
-export function KanbanColumn({ column, tasks, profiles, onTaskClick }: Props) {
-    const {
-        setNodeRef,
-        attributes,
-        listeners,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({
+export function KanbanColumn({ column, tasks, profiles, onTaskClick, onDeleteTask }: Props) {
+    const { setNodeRef } = useDroppable({
         id: column.id,
-        data: {
-            type: 'Column',
-            column,
-        },
-        disabled: true, // Disable column drag for now if we want fixed columns
     });
 
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-    };
-
-    const taskIds = tasks.map(t => t.id);
+    const taskIds = useMemo(() => tasks.map((t) => t.id), [tasks]);
 
     return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            className="flex flex-col w-80 h-full max-h-full rounded-xl bg-gray-50/50 border border-gray-200"
-        >
-            <div className="p-4 font-semibold text-gray-700 flex justify-between items-center bg-white rounded-t-xl border-b border-gray-100">
-                <h3>{column.title}</h3>
-                <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
-                    {tasks.length}
-                </span>
+        <div className="flex flex-col w-80 bg-gray-50 rounded-xl border border-gray-200 shadow-sm flex-shrink-0 max-h-full">
+            {/* Header */}
+            <div className="p-4 flex items-center justify-between border-b border-gray-100 bg-white rounded-t-xl">
+                <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-gray-700">{column.title}</h3>
+                    <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full font-medium">
+                        {tasks.length}
+                    </span>
+                </div>
+                <button className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded transition-colors">
+                    <MoreHorizontal size={16} />
+                </button>
             </div>
 
-            <div className="flex-1 p-2 flex flex-col gap-2 overflow-y-auto min-h-[100px]">
+            {/* Task List */}
+            <div ref={setNodeRef} className="flex-1 p-3 overflow-y-auto min-h-[150px] flex flex-col gap-3">
                 <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
                     {tasks.map((task) => (
                         <TaskCard
@@ -57,10 +47,10 @@ export function KanbanColumn({ column, tasks, profiles, onTaskClick }: Props) {
                             task={task}
                             profile={task.assignee_id ? profiles[task.assignee_id] : null}
                             onClick={() => onTaskClick(task)}
+                            onDelete={() => onDeleteTask(task.id)}
                         />
                     ))}
                 </SortableContext>
-                {/* Placeholder for dropping */}
             </div>
         </div>
     );
